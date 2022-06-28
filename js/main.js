@@ -38,13 +38,21 @@ const setBoardClickEvents = (pgn) => {
 	const id = makeBoardId(pgn);
 	const $el = $('#' + id);
 	
-	$el.click((self) => {
+	$el.click(() => {
+		$el.parent().parent().nextAll('.moveOptionsRow').remove();
+		$el.parent().siblings().addClass('opacity-25');
+		$el.parent().removeClass('opacity-25');
 		makeNextRow(pgn);
+		$('html, body').scrollTop($(document).height());
 	});
 };
 
 const makeNextRow = (currentLine) => {
 	const nextLines = getNextLines(currentLine);
+	
+	if (!nextLines.length) {
+		return;
+	}
 	
 	// make and add the DOM first
 	
@@ -72,8 +80,5 @@ const makeNextRow = (currentLine) => {
 
 $(document).ready(() => {
 	const board = makeBoard(startLine);
-	console.log('#' + makeBoardId(startLine));
-	$('#' + makeBoardId(startLine)).click(() => {
-		makeNextRow(startLine);
-	});
+	setBoardClickEvents(startLine);
 });
