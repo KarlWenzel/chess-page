@@ -2,7 +2,7 @@ const allLines = [
 	'1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3',
 	'1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3',
 	'1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 a6 5.Nc3',
-	'1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nf3 5.Nc3',
+	'1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3',
 	'1.e4 e5 2.Nf3 Nc6 3.Bb5',
 	'1.e4 e5 2.Nf3 Nc6 3.d4',
 	'1.e4 e5 2.Nf3 Nc6 3.Bc4',
@@ -14,13 +14,20 @@ const startLine = '1.e4';
 const chess = new Chess();
 
 const getNextLines = (currentLine) => {	
-	const nextMoveNumber = currentLine.split(' ').length + 1;
+	const nextMoveNumber = currentLine ? currentLine.split(' ').length + 1 : 1;
 	
 	const nextLines = allLines
 		.filter((x) => x.startsWith(currentLine) && x.split(' ').length >= nextMoveNumber)
 		.map((x) => x.split(' ').slice(0, nextMoveNumber).join(' '));
 		
 	return [...new Set(nextLines)];	
+};
+
+const whoMovedLast = (pgn) => {
+	const pgnArray = pgn.split(' ');
+	const lastMove = pgnArray[pgnArray.length - 1];
+	const isWhite = /\d+\..+/;
+	return isWhite.test(lastMove) ? 'white' : 'black';
 };
 
 const makeBoardId = (pgn) => 'board-' + pgn.replaceAll('.', '').replaceAll(' ','-');
@@ -40,7 +47,7 @@ const setBoardClickEvents = (pgn) => {
 	
 	$el.click(() => {
 		$el.parent().parent().nextAll('.moveOptionsRow').remove();
-		$el.parent().siblings().addClass('opacity-25');
+		$el.parent().siblings('div.boardContainer').addClass('opacity-25');
 		$el.parent().removeClass('opacity-25');
 		makeNextRow(pgn);
 		$('html, body').scrollTop($(document).height());
@@ -54,15 +61,19 @@ const makeNextRow = (currentLine) => {
 		return;
 	}
 	
+	const moveNumber = nextLines[0].split(' ').length;
+	const lastMoveColor = whoMovedLast(nextLines[0]);
+	
 	// make and add the DOM first
 	
-	let html = '<div class="moveOptionsRow">';
+	let html = '<div class="moveOptionsRow">'
+			 + `<div style="background:${lastMoveColor}"><h2 style="width:32px; text-align=justify;">${moveNumber}</h2></div>`;
 	for (i in nextLines) {
 		let line = nextLines[i];
 		html = html 
-			+ '<div>'
+			+ '<div class="boardContainer">'
 			+ `<div id="${makeBoardId(line)}" style="width:256px;"></div>`
-			+ `<p>${line}</p>`
+			+ `<p style="width:256px;">${line}</p>`
 			+ '</div>';
 	}
 	html = html + '</div>'
@@ -79,6 +90,5 @@ const makeNextRow = (currentLine) => {
 };
 
 $(document).ready(() => {
-	const board = makeBoard(startLine);
-	setBoardClickEvents(startLine);
+	makeNextRow('');
 });
