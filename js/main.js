@@ -7,8 +7,29 @@ const allLines = [
 	'1.e4 e5 2.Nf3 Nc6 3.d4',
 	'1.e4 e5 2.Nf3 Nc6 3.Bc4',
 	'1.e4 e5 2.Nf3 Nf6',
-	'1.e4 e5 2.Nf3 d6'
+	'1.e4 e5 2.Nf3 d6',	
+	'1.e4 e6 2.d4',
+	'1.e4 c6 2.d4',
+	'1.e4 d6 2.d4',
+	'1.e4 g6 2.d4',
+	'1.e4 d5 2.exd5',
+	'1.e4 Nf6 2.e5'
 ];
+
+const lineNames = [
+	{ line: '1.e4 c5', name: 'Sicilian' },
+	{ line: '1.e4 e5 2.Nf3 Nc6 3.Bb5', name: 'Ruy Lopez' },
+	{ line: '1.e4 e5 2.Nf3 Nc6 3.d4', name: ' Scotch Game' },
+	{ line: '1.e4 e5 2.Nf3 Nc6 3.Bc4', name: 'Italian Game' },
+	{ line: '1.e4 e5 2.Nf3 Nf6', name: 'Petrov\'s' },
+	{ line: '1.e4 e5 2.Nf3 d6', name: 'Philidor\'s' },
+	{ line: '1.e4 e6', name: 'French' },
+	{ line: '1.e4 c6', name: 'Caro-Kahn' },
+	{ line: '1.e4 d6', name: 'Pirc' },
+	{ line: '1.e4 g6', name: 'Modern' },
+	{ line: '1.e4 d5', name: 'Scandinavian' },
+	{ line: '1.e4 Nf6', name: 'Alekhine\'s' }
+]
 
 const startLine = '1.e4';
 const chess = new Chess();
@@ -70,10 +91,12 @@ const makeNextRow = (currentLine) => {
 			 + `<div style="background:${lastMoveColor}"><h2 style="width:32px; text-align=justify;">${moveNumber}</h2></div>`;
 	for (i in nextLines) {
 		let line = nextLines[i];
+		let lineNameObj = lineNames.filter((x) => x.line==line);
+		let lineName = lineNameObj.length ? lineNameObj[0].name : "";
 		html = html 
 			+ '<div class="boardContainer">'
 			+ `<div id="${makeBoardId(line)}" style="width:256px;"></div>`
-			+ `<p style="width:256px;">${line}</p>`
+			+ `<p style="width:256px;">${line} <b>${lineName}</b></p>`
 			+ '</div>';
 	}
 	html = html + '</div>'
