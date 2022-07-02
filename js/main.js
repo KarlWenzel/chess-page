@@ -1,3 +1,8 @@
+/*
+One page for attacking as white, with my preferred choices and traps
+One page for defending with black, and show the board reversed
+*/
+
 const allLines = [
 	'1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3',
 	'1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3',
@@ -8,8 +13,9 @@ const allLines = [
 	'1.e4 e5 2.Nf3 Nc6 3.Bc4',
 	'1.e4 e5 2.Nf3 Nf6',
 	'1.e4 e5 2.Nf3 d6',	
-	'1.e4 e6 2.d4',
-	'1.e4 c6 2.d4',
+	'1.e4 e6 2.d4 d5 3.Nc3 Bb4',
+	'1.e4 e6 2.d4 d5 3.Nc3 Nf6',
+	'1.e4 c6 2.d4 d5 3.e5 Bf5 4.Nf3 e6',
 	'1.e4 d6 2.d4',
 	'1.e4 g6 2.d4',
 	'1.e4 d5 2.exd5',
@@ -31,7 +37,6 @@ const lineNames = [
 	{ line: '1.e4 Nf6', name: 'Alekhine\'s' }
 ]
 
-const startLine = '1.e4';
 const chess = new Chess();
 
 const getNextLines = (currentLine) => {	
@@ -59,7 +64,7 @@ const makeBoard = (pgn) => {
 	chess.load_pgn(pgn);
 	const fen = chess.fen();
 	
-	return Chessboard(boardName, { showNotation: false, position: fen});
+	return Chessboard(boardName, { showNotation: false, position: fen});  //orientation: 'black'
 };
 
 const setBoardClickEvents = (pgn) => {
@@ -84,11 +89,12 @@ const makeNextRow = (currentLine) => {
 	
 	const moveNumber = nextLines[0].split(' ').length;
 	const lastMoveColor = whoMovedLast(nextLines[0]);
+	const lastMoveOppositeColor = (lastMoveColor == 'white') ? 'black' : 'white';
 	
 	// make and add the DOM first
 	
 	let html = '<div class="moveOptionsRow">'
-			 + `<div style="background:${lastMoveColor}"><h2 style="width:32px; text-align=justify;">${moveNumber}</h2></div>`;
+			 + `<div style="background:${lastMoveColor}"><h2 style="width:32px; text-align=justify; color:${lastMoveOppositeColor}">${moveNumber}</h2></div>`;
 	for (i in nextLines) {
 		let line = nextLines[i];
 		let lineNameObj = lineNames.filter((x) => x.line==line);
