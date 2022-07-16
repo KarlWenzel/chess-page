@@ -4,18 +4,20 @@ One page for defending with black, and show the board reversed
 */
 
 const allLines = [
-	'1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3',
-	'1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3',
+	'1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 g6',
 	'1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 a6 5.Nc3',
-	'1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3',
+	'1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6 5.Nf3 Nf6 6.Bd3', /* important not to 5.Nc3 because ...d5, 6...d4 will chase away the Kight */
+	'1.e4 c5 2.Nf3 Nc6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3',
 	'1.e4 e5 2.Nf3 Nc6 3.Bb5',
 	'1.e4 e5 2.Nf3 Nc6 3.d4',
 	'1.e4 e5 2.Nf3 Nc6 3.Bc4',
 	'1.e4 e5 2.Nf3 Nf6',
 	'1.e4 e5 2.Nf3 d6',	
-	'1.e4 e6 2.d4 d5 3.Nc3 Bb4',
+	'1.e4 e6 2.d4 d5 3.Nc3 Bb4 4.exd5 exd5 5.Bd3 c5 ',
+	'1.e4 e6 2.d4 d5 3.Nc3 Bb4 4.exd5 exd5 5.Bd3 Nf6',
 	'1.e4 e6 2.d4 d5 3.Nc3 Nf6',
 	'1.e4 c6 2.d4 d5 3.e5 Bf5 4.Nf3 e6',
+	'1.e4 c6 2.d4 d5 3.Nc3 dxe4 4.Nxe4 Bf5',
 	'1.e4 d6 2.d4',
 	'1.e4 g6 2.d4',
 	'1.e4 d5 2.exd5',
@@ -24,13 +26,20 @@ const allLines = [
 
 const lineNames = [
 	{ line: '1.e4 c5', name: 'Sicilian' },
+	{ line: '1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4', name: 'Sicilian: Open Var.' },
+	{ line: '1.e4 c5 2.Nf3 d6 3.d4 cxd4 4.Nxd4 Nf6 5.Nc3 g6', name: 'Sicilian: Dragon Var.' },
+	{ line: '1.e4 c5 2.Nf3 e6', name: 'Sicilian: French Var.' },
+	{ line: '1.e4 c5 2.Nf3 e6 3.d4 cxd4 4.Nxd4 Nc6', name: 'Sicilian: Taimanov Var.' },
 	{ line: '1.e4 e5 2.Nf3 Nc6 3.Bb5', name: 'Ruy Lopez' },
 	{ line: '1.e4 e5 2.Nf3 Nc6 3.d4', name: ' Scotch Game' },
 	{ line: '1.e4 e5 2.Nf3 Nc6 3.Bc4', name: 'Italian Game' },
 	{ line: '1.e4 e5 2.Nf3 Nf6', name: 'Petrov\'s' },
 	{ line: '1.e4 e5 2.Nf3 d6', name: 'Philidor\'s' },
 	{ line: '1.e4 e6', name: 'French' },
+	{ line: '1.e4 e6 2.d4 d5 3.Nc3 Bb4', name: 'French: Winawer' },
 	{ line: '1.e4 c6', name: 'Caro-Kahn' },
+	{ line: '1.e4 c6 2.d4 d5 3.Nc3 dxe4 4.Nxe4 Bf5', name: 'Caro-Kahn: Classic' },
+	{ line: '1.e4 c6 2.d4 d5 3.e5', name: 'Caro-Kahn: Advance Var.' },
 	{ line: '1.e4 d6', name: 'Pirc' },
 	{ line: '1.e4 g6', name: 'Modern' },
 	{ line: '1.e4 d5', name: 'Scandinavian' },
@@ -80,6 +89,11 @@ const setBoardClickEvents = (pgn) => {
 	});
 };
 
+const getFormattedMoveNumber = (moveNumber) => {
+	const halfMoveNumber = Math.floor((moveNumber+1) / 2);
+	return moveNumber % 2 == 1 ? halfMoveNumber : halfMoveNumber + '...';
+};
+
 const makeNextRow = (currentLine) => {
 	const nextLines = getNextLines(currentLine);
 	
@@ -88,13 +102,14 @@ const makeNextRow = (currentLine) => {
 	}
 	
 	const moveNumber = nextLines[0].split(' ').length;
+	const formattedMoveNumber = getFormattedMoveNumber(moveNumber);
 	const lastMoveColor = whoMovedLast(nextLines[0]);
 	const lastMoveOppositeColor = (lastMoveColor == 'white') ? 'black' : 'white';
 	
 	// make and add the DOM first
 	
 	let html = '<div class="moveOptionsRow">'
-			 + `<div style="background:${lastMoveColor}"><h2 style="width:32px; text-align=justify; color:${lastMoveOppositeColor}">${moveNumber}</h2></div>`;
+			 + `<div style="background:${lastMoveColor}"><h2 style="width:64px; text-align=justify; color:${lastMoveOppositeColor}">${formattedMoveNumber}</h2></div>`;
 	for (i in nextLines) {
 		let line = nextLines[i];
 		let lineNameObj = lineNames.filter((x) => x.line==line);
